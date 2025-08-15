@@ -1,8 +1,9 @@
-import { connection } from "mongoose";
+import mongoose from "mongoose";
 import imagekit from "../configs/imageKit.js";
 import Connection from "../models/Connections.js";
 import User from "../models/User.js"
 import fs from "fs"
+import POST from "../models/Post.js";
 
 export const getUserData = async (req, res) => {
     try {
@@ -247,6 +248,23 @@ export const acceptConnectionRequest = async (req, res) => {
         await connection.save()
 
         res.json({success: true, message: "Connection accepted successfully"})
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message: error.message})
+    }
+}
+
+// Get User Profiles 
+export const getUserProfiles = async(req, res) => {
+    try {
+        const {profileId} = req.body;
+        const profile = await User.findById(profileId)
+        if(!profile) {
+            res.json({success: false, message: "Profile not found"})
+        }
+        const posts = await POST.find({user: profileId}).populate('user')
+
+        res.json({success: true, profile, posts})
     } catch (error) {
         console.log(error);
         res.json({success: false, message: error.message})
