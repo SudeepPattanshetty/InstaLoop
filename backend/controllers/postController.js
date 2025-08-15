@@ -1,6 +1,6 @@
 import fs from "fs";
 import imagekit from "../configs/imageKit.js";
-import POST from "../models/Post.js";
+import Post from "../models/Post.js";
 import User from "../models/User.js";
 
 export const addPost = async(req, res) => {
@@ -34,14 +34,14 @@ export const addPost = async(req, res) => {
                 })
             )
         }
-        await POST.create({
+        await Post.create({
             user: userId,
             content,
             image_urls,
             post_type
         })
 
-        res.json({success: true, message: "POST created successfully"})
+        res.json({success: true, message: "Post created successfully"})
 
     } catch (error) {
         console.log(error);
@@ -56,7 +56,7 @@ export const getFeedPosts = async(req, res) => {
         const user = await User.findById(userId)
 
         const userIds = [userId, ...user.connections, ...user.following]
-        const posts = await POST.find({user: {$in: userIds}}).populate('user').sort({createdAt: -1});
+        const posts = await Post.find({user: {$in: userIds}}).populate('user').sort({createdAt: -1});
 
         res.json({success: true, posts})
     } catch (error) {
@@ -71,7 +71,7 @@ export const likePost = async(req, res)  => {
         const {userId} = req.auth()
         const {postId} = req.body;
 
-        const post = await POST.findById(postId)
+        const post = await Post.findById(postId)
 
         if(post.likes_count.includes(userId)){
             post.likes_count = post.likes_count.filter(user => user !== userId)

@@ -8,6 +8,6 @@ const PostSchema = new mongoose.Schema({
     likes_count: [{type: String, ref: 'User'}],
 }, {timestamps: true, minimize: false})
 
-const POST = mongoose.model('Post', PostSchema)
+const Post = mongoose.model('Post', PostSchema)
 
-export default POST;
+export default Post;

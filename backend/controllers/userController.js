@@ -3,7 +3,7 @@ import imagekit from "../configs/imageKit.js";
 import Connection from "../models/Connections.js";
 import User from "../models/User.js"
 import fs from "fs"
-import POST from "../models/Post.js";
+import Post from "../models/Post.js";
 
 export const getUserData = async (req, res) => {
     try {
@@ -262,7 +262,7 @@ export const getUserProfiles = async(req, res) => {
         if(!profile) {
             res.json({success: false, message: "Profile not found"})
         }
-        const posts = await POST.find({user: profileId}).populate('user')
+        const posts = await Post.find({user: profileId}).populate('user')
 
         res.json({success: true, profile, posts})
     } catch (error) {
