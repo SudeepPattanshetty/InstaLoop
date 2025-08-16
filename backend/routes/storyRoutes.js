@@ -1,4 +1,5 @@
 import express from "express"
+import { upload } from "../configs/multer.js";
 import { addUserStory, getStories } from "../controllers/storyController.js"
 import { protect } from "../middlewares/auth.js";
 
