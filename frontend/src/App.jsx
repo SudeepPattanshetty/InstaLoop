@@ -12,17 +12,24 @@ import ChatBox from './pages/Chatbox'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import Layout from './pages/Layout'
 import { Toaster } from 'react-hot-toast'
+import { fetchUser } from './features/user/userSlice.js'
+import { useDispatch } from 'react-redux'
 
 function App() {
 
   const {user} = useUser()
   const {getToken} = useAuth()
+  const dispatch = useDispatch()
 
   useEffect(() => {
-      if(user) {
-        getToken().then((token) => console.log(token))
-    }
-  }, [user])
+      const fetchData = async() =>{
+        if(user) {
+          const token = await getToken()
+          dispatch(fetchUser(token))
+      }
+      }
+      fetchData()
+  }, [user, getToken, dispatch])
 
   return (
    <>

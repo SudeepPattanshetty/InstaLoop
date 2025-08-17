@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets'
 import { Pencil } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 const ProfileModal = ({setShowEdit}) => {
 
-    const user = dummyUserData
+    const user = useSelector((state) => state.user.value)
     const [editForm, setEditForm] = useState({
         username: user.username,
         bio: user.bio,
@@ -14,9 +15,9 @@ const ProfileModal = ({setShowEdit}) => {
         full_name: user.full_name
     })
 
-    const handleSaveProfile = async((e) => {
+    const handleSaveProfile = async(e) => {
         e.preventDefault();
-    })
+    }
     return (
     <div className='fixed top-0 bottom-0 left-0 right-0 z-110 h-screen overflow-y-scroll bg-black/50'>
       <div className='max-w-2xl sm:py-6 mx-auto'>
