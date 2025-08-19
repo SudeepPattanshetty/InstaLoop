@@ -4,6 +4,9 @@ import React, { useState } from 'react'
 import { dummyUserData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useAuth } from '@clerk/clerk-react'
+import toast from 'react-hot-toast'
+import api from '../api/axios'
 
 const PostCard = ({post}) => {
 
@@ -12,8 +15,27 @@ const PostCard = ({post}) => {
     const currentUser = useSelector((state) => state
     .user.value)
 
-    const handleLike = () => {
-        
+    const { getToken } = useAuth();
+
+    const handleLike = async () => {
+        try {
+            const {data} = await api.post(`/api/post/like`, {postId: post._id}, {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+            if(data.success) {
+                toast.success(data.message)
+                setLikes(prev => {
+                    if(prev.includes(currentUser._id)) {
+                        return prev.filter(id => id !== currentUser._id)
+                    }else{
+                        return [...prev, currentUser._id]
+                    }
+                })
+            }else{
+                toast(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
     }
 
     const navigate = useNavigate();
@@ -35,7 +57,7 @@ const PostCard = ({post}) => {
         {post.content && <div className='text-gray-800 text-sm whitespace-pre-line' dangerouslySetInnerHTML={{__html: postWithHashtags}}></div> }
 
         {/* Images */}
-        <div className='grid grid-rows'>
+        <div className='grid grid-rows gap-4'>
             {post.image_urls.map((img, index) => (
                 <img src={img} key={index} className={`w-full h-48 object-cover rounded-lg ${post.image_urls.length === 1 && 'h-auto'}`} alt="" />
             ))}

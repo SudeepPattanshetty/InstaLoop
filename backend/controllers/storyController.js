@@ -12,7 +12,7 @@ export const addUserStory = async (req, res) => {
         let media_url = ""
 
         if (media_type === "image" || media_type === "video") {
-            const fileBuffer = fs.readFileSync(media_type)
+            const fileBuffer = fs.readFileSync(media.path)
             const response = await imagekit.upload({
                 file: fileBuffer,
                 fileName: media.originalname
@@ -45,7 +45,7 @@ export const addUserStory = async (req, res) => {
 // Get User Stories 
 export const getStories = async (req, res) => {
     try {
-        const userId = req.auth();
+        const {userId} = req.auth();
         const user = await User.findById(userId);
 
         const userIds = [userId, ...user.connections, user.following]

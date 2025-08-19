@@ -3,17 +3,50 @@ import { dummyUserData } from '../assets/assets'
 import { Image, X } from 'lucide-react'
 import toast from "react-hot-toast"
 import { useSelector } from 'react-redux'
+import api from '../api/axios'
+import { useAuth } from '@clerk/clerk-react'
+import { useNavigate } from 'react-router-dom'
 
 const CreatePost = () => {
 
+  const navigate = useNavigate();
   const [content, setContent] = useState('')
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
+  const {getToken} = useAuth();
 
   const user = useSelector((state) => state.user.value);
 
   const handleSubmit = async() => {
+    if(!images.length && !content) {
+      return toast.error('Please add at least one image or text')
+    }
+    setLoading(true)
 
+    const postType = images.length && content ? "text_with_image" : images.length ? 'image' : 'text'
+
+    try {
+      const formData = new FormData();
+      formData.append("content", content)
+      formData.append("post_type", postType)
+      images.map((image) => {
+        formData.append('images', image)
+      })
+
+      const {data} = await api.post('/api/post/add', formData, {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+      if(data.success) {
+        navigate('/')
+      }
+      else{
+        console.log(data.message);
+        throw new Error(data.message)
+      }
+    } catch (error) {
+      console.log(error.message);
+        throw new Error(error.message)
+    }
+    setLoading(false)
   }
 
   return (
@@ -43,7 +76,7 @@ const CreatePost = () => {
             images.length > 0 && <div className='flex flex-wrap gap-2 mt-4'>
               {images.map((images, i) => (
                 <div key={i} className='relative-group'>
-                <img src={URL.createObjectURL(image)} className='h-20 rounded-md' alt="" />
+                <img src={URL.createObjectURL(images)} className='h-20 rounded-md' alt="" />
                   <div onClick={() => setImages(images.filter((_, index) => index !== i))} className='absolute hidden group-hover:flex justify-center items-center top-0 right-0 bottom-0 left-0 bg-black/40 rounded-md cursor-pointer'>
                     <X className='w-6 h-6 text-white' />
                   </div>
