@@ -1,17 +1,19 @@
 import { BadgeCheck, Heart, MessageCircle, Share2 } from 'lucide-react'
 import moment from 'moment'
-import React, { useState } from 'react'
-import { dummyUserData } from '../assets/assets'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useAuth } from '@clerk/clerk-react'
 import toast from 'react-hot-toast'
 import api from '../api/axios'
+import CommentBox from './CommentBox'
 
 const PostCard = ({post}) => {
 
     const postWithHashtags = post.content.replace(/(#\w+)/g, '<span class="text-indigo-600">$1</span>')
     const [likes, setLikes] = useState(post.likes_count)
+    const [showComment, setShowComment] = useState(false)
+    const [share, setShares] = useState(post.share_count || [])
     const currentUser = useSelector((state) => state
     .user.value)
 
@@ -34,6 +36,27 @@ const PostCard = ({post}) => {
                 toast(data.message)
             }
         } catch (error) {
+            console.error(error.message)
+        }
+    }
+
+    const handleCommentToggle = async() => {
+        setShowComment(prev => !prev);
+    }
+    
+    const handleShare = async() => {
+        try {
+            const {data} = await api.post(`/api/post/share`, {postId: post._id}, {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+            if(data.success) {
+                toast.success(data.message)
+                setShares(prev => {
+                    return [...prev, currentUser._id]
+                })
+            }else{
+                toast.success(data.message);
+            }
+        } catch (error) {
             toast.error(error.message)
         }
     }
@@ -41,7 +64,7 @@ const PostCard = ({post}) => {
     const navigate = useNavigate();
 
   return (
-    <div className='bg-white rounded-xl shadow p-4 space-y-4 w-full max-w-2xl'>
+    <div className='bg-white rounded-xl shadow p-4 h-auto space-y-4 w-full max-w-2xl'>
       {/* User Info */}
       <div onClick={() => navigate('/profile/' + post.user._id)} className='inline-flex items-center gap-3 cursor-pointer'>
         <img src={post.user.profile_picture} alt="" className="w-10 h-full rounded-full shadow" />
@@ -65,18 +88,26 @@ const PostCard = ({post}) => {
 
         {/* Actions  */}
         <div className='flex items-center gap-4 text-gray-600 text-sm pt-2 border-t border-gray-300'>
-            <div className='flex items-center gap-1'>
-                <Heart className={`w-4 h-4 cursor-pointer ${likes.includes(currentUser._id) && 'text-red-500 fill-red-500'}`} onClick={handleLike} />
-                <span>{likes.length}</span>
+        {!showComment && (
+            <div className='flex items-center gap-4 text-gray-600 text-sm'>
+                <div className='flex items-center gap-1'>
+                    <Heart className={`w-4 h-4 cursor-pointer ${likes.includes(currentUser._id) && 'text-red-500 fill-red-500'}`} onClick={handleLike} />
+                    <span>{likes.length || 0}</span>
+                </div>
+                <div className='flex items-center gap-1'>
+                    <MessageCircle className='w-4 h-4 cursor-pointer' onClick={handleCommentToggle} />
+                    <span>{0}</span>
+                </div>
+                <div className='flex items-center gap-1'> 
+                    <Share2 className='w-4 h-4 cursor-pointer' onClick={handleShare} />
+                    <span>{share.length}</span>
+                </div>
             </div>
-            <div className='flex items-center gap-1'>
-                <MessageCircle className='w-4 h-4' />
-                <span>{12}</span>
-            </div>
-            <div className='flex items-center gap-1'>
-                <Share2 className='w-4 h-4' />
-                <span>{7}</span>
-            </div>
+        )}
+
+        {showComment && (
+            <CommentBox key={post._id} post={post} />
+        )}
         </div>
     </div>
   )

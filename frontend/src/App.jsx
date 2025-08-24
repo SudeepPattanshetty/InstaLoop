@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux'
 import { fetchConnections } from './features/connections/connectionSlice.js'
 import { addMessages } from './features/messages/messageSlice.js'
 import Notification from './components/Notification.jsx'
+import CommentBox from './components/CommentBox.jsx'
 
 function App() {
 
@@ -74,6 +75,7 @@ function App() {
       <Route path='profile' element={<Profile />} />
       <Route path='profile/:profileId' element={<Profile />} />
       <Route path='create-post' element={<CreatePost />} />
+      <Route path='comment-box' element={<CommentBox />} /> 
     </Route>
    </Routes>
    </>

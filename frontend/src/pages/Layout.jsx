@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Loading from '../components/Loading';
-import { dummyUserData } from '../assets/assets';
 import Sidebar from '../components/Sidebar';
 import { Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
@@ -17,9 +16,9 @@ const Layout = () => {
         <Outlet />
       </div>
       {sidebarOpen ? (
-        <X className="absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 sm:hidden" onClick={() => setSidebarOpen(false)} />
+        <X className="absolute top-1 left-45 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 sm:hidden" onClick={() => setSidebarOpen(false)} />
       ) : (
-        <Menu className="absolute top-3 right-3 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 sm:hidden" onClick={() => setSidebarOpen(true)} />
+        <Menu className="absolute top-2 p-2 z-100 bg-white rounded-md shadow w-10 h-10 text-gray-600 sm:hidden" onClick={() => setSidebarOpen(true)} />
       )}
     </div>
   ) : (
